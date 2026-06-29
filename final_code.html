@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Simple Image Compressor</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f4f4;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
+.container{background:white;padding:25px;border-radius:12px;width:340px;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,.15);}
+img{max-width:100%;margin-top:15px;border-radius:8px;} input[type=range]{width:100%;}
+button{margin-top:15px;padding:10px 18px;border:none;border-radius:8px;background:#4CAF50;color:white;cursor:pointer;font-size:16px;width:100%;}
+button:hover{background:#43a047;} #info{margin-top:15px;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Image Compressor</h2>
+    <input type="file" id="file" accept="image/*">
+    <p>Quality: <span id="q">80</span>%</p>
+    <input type="range" id="quality" min="10" max="100" value="80">
+    <img id="preview">
+    <div id="info"></div>
+    <button id="download" style="display:none;">Download Compressed Image</button>
+</div>
+<script>
+const fileInput=document.getElementById("file"), preview=document.getElementById("preview"), quality=document.getElementById("quality"), q=document.getElementById("q"), download=document.getElementById("download"), info=document.getElementById("info");
+let image, currentBlobUrl = null;
+quality.oninput=()=>{ q.textContent=quality.value; if(image) compress(); }
+fileInput.onchange=(e)=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{ image=new Image(); image.onload=compress; image.src=reader.result; preview.src=reader.result; };
+    reader.readAsDataURL(file);
+}
+function compress(){
+    const canvas=document.createElement("canvas"), ctx=canvas.getContext("2d");
+    canvas.width=image.width; canvas.height=image.height; ctx.drawImage(image,0,0);
+    canvas.toBlob((blob)=>{
+        if(currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+        currentBlobUrl=URL.createObjectURL(blob); download.style.display="block";
+        download.onclick=()=>{ const a=document.createElement("a"); a.href=currentBlobUrl; a.download="compressed.jpg"; a.click(); };
+        info.innerHTML=`Original: ${(image.src.length*0.75/1024).toFixed(0)} KB<br>Compressed: ${(blob.size/1024).toFixed(0)} KB`;
+    },"image/jpeg",quality.value/100);
+}
+</script>
+</body>
+</html>
