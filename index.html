@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Image Compressor</title>
+<style>
+    :root {
+        --bg-main: #f8f7f4;
+        --bg-card: #ffffff;
+        --text-main: #1c2416;
+        --text-muted: #70776b;
+        --primary: #27522a;
+        --primary-hover: #1b3b1e;
+        --primary-light: #f1f6f0;
+        --border-color: #e5e8e2;
+        --accent-green: #388e3c;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .dashboard {
+        background: var(--bg-card);
+        width: 100%;
+        max-width: 1040px;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Header Styling */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .app-icon {
+        background: var(--primary-light);
+        padding: 12px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .app-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: var(--primary);
+    }
+
+    .header-title h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .header-title p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    /* Main Workspace Grid */
+    .workspace {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 25px;
+    }
+
+    /* Left Sidebar Panel */
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .dropzone {
+        border: 2px dashed #c2ccbe;
+        background: var(--primary-light);
+        border-radius: 16px;
+        padding: 25px 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .dropzone.dragover {
+        border-color: var(--primary);
+        background: #e4efe2;
+    }
+
+    .dropzone svg {
+        width: 36px;
+        height: 36px;
+        stroke: var(--primary);
+        margin-bottom: 12px;
+    }
+
+    .dropzone p {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        line-height: 1.4;
+    }
+
+    .dropzone span {
+        font-weight: 400;
+        color: var(--text-muted);
+        display: block;
+        margin-top: 4px;
+    }
+
+    .btn-browse {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 15px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        width: 100%;
+        max-width: 180px;
+    }
+
+    .btn-browse:hover {
+        background: var(--primary-hover);
+    }
+
+    .file-info-hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 12px;
+        text-align: center;
+    }
+
+    /* Controls */
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .control-label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .control-label span {
+        color: var(--accent-green);
+    }
+
+    input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        background: var(--border-color);
+        border-radius: 3px;
+        outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--primary);
+        cursor: pointer;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .range-limits {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: -4px;
+    }
+
+    /* Tip Box */
+    .tip-box {
+        background: #f7f9f6;
+        border: 1px solid var(--border-color);
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .tip-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent-green);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .tip-text {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    /* Right Preview Panel */
+    .preview-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 25px;
+    }
+
+    .images-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .image-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .image-label {
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .image-label::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--accent-green);
+        border-radius: 50%;
+    }
+
+    .img-wrapper {
+        position: relative;
+        background: #fdfdfd;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        aspect-ratio: 4 / 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .size-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.65);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* Status Bar Metrics */
+    .metrics-bar {
+        background: #fafaf9;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 20px 10px;
+        text-align: center;
+    }
+
+    .metric-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .metric-item:not(:last-child) {
+        border-right: 1px dashed var(--border-color);
+    }
+
+    .metric-icon {
+        background: #ffffff;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .metric-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .metric-details {
+        text-align: left;
+    }
+
+    .metric-label {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .metric-value {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .metric-value.highlight {
+        color: var(--accent-green);
+    }
+
+    /* Download Action Area */
+    .action-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 5px;
+    }
+
+    .btn-download {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.2s;
+    }
+
+    .btn-download:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-download svg {
+        width: 18px;
+        height: 18px;
+        fill: white;
+    }
+
+    /* Hidden element helper */
+    input[type="file"] {
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="header">
+        <div class="header-left">
+            <div class="app-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+            </div>
+            <div class="header-title">
+                <h1>Image Compressor</h1>
+                <p>Compress your images with the perfect quality</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        
+        <div class="sidebar">
+            <div class="dropzone" id="dropzone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <p>Drag & drop an image <span>or click to browse</span></p>
+                <button class="btn-browse" type="button">
+                    Choose Image
+                </button>
+                <div class="file-info-hint">
+                    JPG, PNG, WEBP up to 10MB
+                </div>
+                <input type="file" id="file" accept="image/*">
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">Quality: <span id="q">80%</span></label>
+                <input type="range" id="quality" min="10" max="100" value="80">
+                <div class="range-limits">
+                    <span>10%</span>
+                    <span>100%</span>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Tip
+                </div>
+                <div class="tip-text">Lower quality means smaller file size. Try 70-80% for the best balance.</div>
+            </div>
+        </div>
+
+        <div class="preview-panel">
+            <div class="images-container">
+                <div class="image-card">
+                    <div class="image-label">Original Image</div>
+                    <div class="img-wrapper">
+                        <img id="preview-orig" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100%' height='100%' fill='%23fafafa'/></svg>">
+                        <div class="size-badge" id="badge-orig">0 KB</div>
+                    </div>
+                </div>
+                <div class="image-card">
+                    <div class="image-label">Compressed Image</div>
+                    <div class="img-wrapper">
+                        <img id="preview-comp" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100%' height='100%' fill='%23fafafa'/></svg>">
+                        <div class="size-badge" id="badge-comp" style="background-color: var(--accent-green);">0 KB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-bar">
+                <div class="metric-item">
+                    <div class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#70776b" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-label">Original Size</div>
+                        <div class="metric-value" id="stat-orig">-</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#27522a" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-label">Compressed Size</div>
+                        <div class="metric-value" id="stat-comp">-</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#388e3c" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-label">Space Saved</div>
+                        <div class="metric-value highlight" id="stat-saved">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-container">
+                <button id="download" class="btn-download" style="visibility: hidden;">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                    Download Compressed Image
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const fileInput = document.getElementById("file");
+const dropzone = document.getElementById("dropzone");
+const btnBrowse = document.querySelector(".btn-browse");
+const previewOrig = document.getElementById("preview-orig");
+const previewComp = document.getElementById("preview-comp");
+const quality = document.getElementById("quality");
+const q = document.getElementById("q");
+const download = document.getElementById("download");
+
+// Stats & Badges
+const badgeOrig = document.getElementById("badge-orig");
+const badgeComp = document.getElementById("badge-comp");
+const statOrig = document.getElementById("stat-orig");
+const statComp = document.getElementById("stat-comp");
+const statSaved = document.getElementById("stat-saved");
+
+let originalImageElement = null;
+let originalFileSize = 0;
+let currentFileType = "image/jpeg";
+
+// Slider input response
+quality.oninput = () => {
+    q.textContent = quality.value + "%";
+    if (originalImageElement) compress();
+};
+
+// Open dialog on dropzone or button click
+btnBrowse.onclick = (e) => { e.stopPropagation(); fileInput.click(); };
+dropzone.onclick = () => fileInput.click();
+
+// Drag & Drop handlers
+dropzone.ondragover = (e) => { e.preventDefault(); dropzone.classList.add("dragover"); };
+dropzone.ondragleave = () => dropzone.classList.remove("dragover");
+dropzone.ondrop = (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+    if (e.dataTransfer.files.length > 0) {
+        processFile(e.dataTransfer.files[0]);
+    }
+};
+
+fileInput.onchange = (e) => {
+    if (e.target.files.length > 0) processFile(e.target.files[0]);
+};
+
+function formatSize(bytes) {
+    if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    return (bytes / 1024).toFixed(0) + " KB";
+}
+
+function processFile(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    originalFileSize = file.size;
+    currentFileType = file.type;
+
+    const reader = new FileReader();
+    reader.onload = function() {
+        originalImageElement = new Image();
+        originalImageElement.onload = () => {
+            previewOrig.src = reader.result;
+            badgeOrig.textContent = formatSize(originalFileSize);
+            statOrig.textContent = formatSize(originalFileSize);
+            compress();
+        };
+        originalImageElement.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function compress() {
+    if (!originalImageElement) return;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = originalImageElement.width;
+    canvas.height = originalImageElement.height;
+    ctx.drawImage(originalImageElement, 0, 0);
+
+    const outputType = currentFileType === "image/png" || currentFileType === "image/webp" ? currentFileType : "image/jpeg";
+
+    canvas.toBlob(function(blob) {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        
+        previewComp.src = url;
+        badgeComp.textContent = formatSize(blob.size);
+        statComp.textContent = formatSize(blob.size);
+
+        const savings = ((originalFileSize - blob.size) / originalFileSize) * 100;
+        statSaved.textContent = (savings > 0 ? savings.toFixed(1) : 0) + "%";
+
+        download.style.visibility = "visible";
+        download.onclick = () => {
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `compressed_${Date.now()}.jpg`;
+            a.click();
+        };
+    }, outputType, quality.value / 100);
+}
+</script>
+</body>
+</html>
